@@ -13,7 +13,7 @@ import android.util.Log;
 
 public class SMSReceiver extends BroadcastReceiver {
 
-    private static String TAG = this.getClass().getSimpleName();
+    private String TAG = this.getClass().getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
