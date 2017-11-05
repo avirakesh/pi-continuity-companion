@@ -13,9 +13,11 @@ import android.util.Log;
 
 public class SMSReceiver extends BroadcastReceiver {
 
+    private static String TAG = this.getClass().getSimpleName();
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("Intent", "Received Intent");
+        Log.d(TAG, "Received Intent");
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
@@ -27,7 +29,7 @@ public class SMSReceiver extends BroadcastReceiver {
                     messages[i] = SmsMessage.createFromPdu((byte []) pdus[i]);
                     String address = messages[i].getOriginatingAddress();
                     String message = messages[i].getDisplayMessageBody();
-                    Log.d("Messages", String.format("%s, %s", address, message));
+                    Log.d(TAG, String.format("%s, %s", address, message));
                 }
             }
         }
