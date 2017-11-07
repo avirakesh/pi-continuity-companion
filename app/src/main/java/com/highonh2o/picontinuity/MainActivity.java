@@ -12,13 +12,22 @@ public class MainActivity extends AppCompatActivity {
 
     private String TAG = this.getClass().getSimpleName();
 
+    private String[] columns = {
+        "_id",
+        "thread_id",
+        "address",
+        "protocol",
+        "body"
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Uri uri = Uri.parse("content://sms/sent");
-        Cursor c = getContentResolver().query(uri, null, null, null, null);
+        /*Uri uri = Uri.parse("content://sms");
+        Cursor c = getContentResolver().query(uri, columns, null, null, null);
+//        Cursor c = getContentResolver().query(uri, null, null, null, null);
 
         if (c != null && c.moveToFirst()) {
             int ctr = 0,
@@ -36,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (c != null) {
             c.close();
-        }
+        }*/
+
+        Intent intent = new Intent(this, SmsObserverService.class);
+        startService(intent);
     }
 }
