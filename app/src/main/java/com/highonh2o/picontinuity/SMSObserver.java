@@ -8,23 +8,26 @@ import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
+import java.util.Arrays;
+
 /**
  * Created by avichalrakesh on 11/6/17.
  */
 
 public class SMSObserver extends ContentObserver {
 
-    private Handler m_handler = null;
     private String TAG = this.getClass().getSimpleName();
-    private String[] columns = {
+    private static String[] columns = {
         "_id",
         "thread_id",
         "address",
+        "date",
         "protocol",
         "body"
     };
-    private Context context = null;
 
+    private Handler m_handler = null;
+    private Context context = null;
     SMSObserver(Handler handler, Context context) {
         super(handler);
         m_handler = handler;
@@ -36,12 +39,26 @@ public class SMSObserver extends ContentObserver {
 //        super.onChange(selfChange);
 
         Uri uri = Uri.parse("content://sms");
-        Cursor c = context.getContentResolver().query(uri, columns, null, null, null);
+        String selection = null;
+        String[] selectArgs = null;
+        if (Globals.latestSmsSeen != null) {
+            selection = String.format("%s > ? AND %s > ?", columns[3], columns[0]);
+            selectArgs = new String[] {Globals.latestSmsSeen.getDate(), String.valueOf(Globals.latestSmsSeen.getId())};
+        }
+        Cursor c = context.getContentResolver().query(
+            uri,
+            columns,
+            selection,
+            selectArgs,
+            String.format("%s DESC, %s DESC", columns[3], columns[0])
+        );
 //        Cursor c = getContentResolver().query(uri, null, null, null, null);
 
         if (c != null && c.moveToFirst()) {
             int ctr = 0,
-                target = 50;
+                target = 25;
+
+            boolean updateLatest = true;
 
             do {
                 StringBuilder msgData = new StringBuilder();
@@ -50,6 +67,24 @@ public class SMSObserver extends ContentObserver {
                 }
                 Log.d(TAG, msgData.toString());
                 ctr++;
+
+                if (updateLatest) {
+                    int id = c.getInt(0);
+                    int thread_id = c.getInt(1);
+                    String address = c.getString(2);
+                    String date = c.getString(3);
+                    String protocol = c.getString(4);
+                    String body = c.getString(5);
+                    boolean sent = false;
+                    if (protocol == null) {
+                        sent = true;
+                    }
+
+                    Globals.latestSmsSeen = new SMSData(id, thread_id, address, date, sent, body);
+
+                    updateLatest = false;
+                }
+
             } while (ctr < target && c.moveToNext());
         }
 
