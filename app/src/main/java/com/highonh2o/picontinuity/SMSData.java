@@ -8,19 +8,22 @@ public class SMSData  {
     private int id;
     private int thread_id;
     private String address;
+    private String date;
     private boolean sent;
     private String body;
 
 
-    public SMSData(int id, int thread_id, String address, boolean sent, String body) {
+    public SMSData(int id, int thread_id, String address, String date, boolean sent, String body) {
         this.id = id;
         this.thread_id = thread_id;
         this.address = address;
+        this.date = date;
         this.sent = sent;
         this.body = body;
     }
 
     public int getId() {
+
         return id;
     }
 
@@ -28,55 +31,30 @@ public class SMSData  {
         return thread_id;
     }
 
-    public void setThread_id(int thread_id) {
-        this.thread_id = thread_id;
-    }
-
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public String getDate() {
+        return date;
     }
 
     public boolean isSent() {
         return sent;
     }
 
-    public void setSent(boolean sent) {
-        this.sent = sent;
-    }
-
     public String getBody() {
         return body;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
-
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
 
-        builder.append("ID: ");
-        builder.append(id);
-        builder.append("\n");
-
-        builder.append("Thread ID: ");
-        builder.append(thread_id);
-        builder.append("\n");
-
-        builder.append("Address: ");
-        builder.append(address);
-
-        builder.append(sent ? "Type: Sent\n" : "Type: Received\n");
-
-        builder.append("Body: ");
-        builder.append(body);
-        builder.append("\n");
-
-        return builder.toString();
+        return  "ID: " + id + "\n" +
+                "Thread ID: " + thread_id + "\n" +
+                "Address: " + address + "\n" +
+                "Date: " + date + "\n" +
+                (sent ? "Type: Sent\n" : "Type: Received\n") +
+                "Body: " +  body + "\n";
     }
 }
