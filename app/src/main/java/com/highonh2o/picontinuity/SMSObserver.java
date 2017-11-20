@@ -41,10 +41,12 @@ public class SMSObserver extends ContentObserver {
         Uri uri = Uri.parse("content://sms");
         String selection = null;
         String[] selectArgs = null;
+
         if (Globals.latestSmsSeen != null) {
             selection = String.format("%s > ? AND %s > ?", columns[3], columns[0]);
-            selectArgs = new String[] {Globals.latestSmsSeen.getDate(), String.valueOf(Globals.latestSmsSeen.getId())};
+            selectArgs = new String[]{Globals.latestSmsSeen.getDate(), String.valueOf(Globals.latestSmsSeen.getId())};
         }
+
         Cursor c = context.getContentResolver().query(
             uri,
             columns,
@@ -52,6 +54,7 @@ public class SMSObserver extends ContentObserver {
             selectArgs,
             String.format("%s DESC, %s DESC", columns[3], columns[0])
         );
+
 //        Cursor c = getContentResolver().query(uri, null, null, null, null);
 
         if (c != null && c.moveToFirst()) {

@@ -36,4 +36,6 @@ public class SmsObserverService extends Service {
         super.onDestroy();
         this.getContentResolver().unregisterContentObserver(smsObserver);
     }
+
+
 }
