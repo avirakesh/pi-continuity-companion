@@ -13,13 +13,13 @@ public class NLService extends NotificationListenerService {
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-        Log.d(TAG, "Notification Posted");
+//        Log.d(TAG, "Notification Posted");
         super.onNotificationPosted(sbn);
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
-        Log.d(TAG, "Notification Removed");
+//        Log.d(TAG, "Notification Removed");
         super.onNotificationRemoved(sbn);
     }
 }
