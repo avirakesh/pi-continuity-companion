@@ -8,12 +8,12 @@ public class SMSData  {
     private int id;
     private int thread_id;
     private String address;
-    private String date;
+    private long date;
     private boolean sent;
     private String body;
 
 
-    public SMSData(int id, int thread_id, String address, String date, boolean sent, String body) {
+    SMSData(int id, int thread_id, String address, long date, boolean sent, String body) {
         this.id = id;
         this.thread_id = thread_id;
         this.address = address;
@@ -22,28 +22,27 @@ public class SMSData  {
         this.body = body;
     }
 
-    public int getId() {
-
+    int getId() {
         return id;
     }
 
-    public int getThread_id() {
+    int getThread_id() {
         return thread_id;
     }
 
-    public String getAddress() {
+    String getAddress() {
         return address;
     }
 
-    public String getDate() {
+    long getDate() {
         return date;
     }
 
-    public boolean isSent() {
+    boolean isSent() {
         return sent;
     }
 
-    public String getBody() {
+    String getBody() {
         return body;
     }
 
