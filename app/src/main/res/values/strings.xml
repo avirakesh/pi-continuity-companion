@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">PiContinuity</string>
+    <string name="package_name">com.highonh2o.picontinuity</string>
+    <string name="preference_file_key">dbData</string>
+
+    <string name="last_id">last_id</string>
+    <string name="last_timestamp">last_timestamp</string>
 </resources>
