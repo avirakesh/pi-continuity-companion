@@ -2,6 +2,7 @@ package com.highonh2o.picontinuity;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,6 +10,8 @@ import android.os.Handler;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by avichalrakesh on 11/6/17.
@@ -34,6 +37,8 @@ public class SMSObserver extends ContentObserver {
         this.context = context;
     }
 
+
+
     @Override
     public void onChange(boolean selfChange) {
 //        super.onChange(selfChange);
@@ -42,9 +47,23 @@ public class SMSObserver extends ContentObserver {
         String selection = null;
         String[] selectArgs = null;
 
+        String prefsName = context.getString(R.string.package_name) + "." + context.getString(R.string.preference_file_key);
+        SharedPreferences sharedPrefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE);
+        int lastId = sharedPrefs.getInt(context.getString(R.string.last_id), -1);
+        long lastTime = sharedPrefs.getLong(context.getString(R.string.last_timestamp), 0);
+
+
         if (Globals.latestSmsSeen != null) {
             selection = String.format("%s > ? AND %s > ?", columns[3], columns[0]);
-            selectArgs = new String[]{Globals.latestSmsSeen.getDate(), String.valueOf(Globals.latestSmsSeen.getId())};
+            selectArgs = new String[]{String.valueOf(Globals.latestSmsSeen.getDate()), String.valueOf(Globals.latestSmsSeen.getId())};
+        } else if (lastId != -1) {
+            selection = String.format("%s > ? AND %s > ?", columns[3], columns[0]);
+            selectArgs = new String[] {String.valueOf(lastTime), String.valueOf(lastId)};
+        } else {
+            long currTime = new Date().getTime();
+            long diff = 5 * 24 * 60 * 60 * 1000;
+            selection = String.format("%s >= ?", columns[3]);
+            selectArgs = new String[] {String.valueOf(currTime - diff)};
         }
 
         Cursor c = context.getContentResolver().query(
@@ -55,40 +74,41 @@ public class SMSObserver extends ContentObserver {
             String.format("%s DESC, %s DESC", columns[3], columns[0])
         );
 
-//        Cursor c = getContentResolver().query(uri, null, null, null, null);
 
         if (c != null && c.moveToFirst()) {
-            int ctr = 0,
-                target = 25;
+            int ctr = 0;
 
             boolean updateLatest = true;
 
             do {
-                StringBuilder msgData = new StringBuilder();
-                for (int i = 0; i < c.getColumnCount(); i++) {
-                    msgData.append(String.format("%s : %s\n", c.getColumnName(i), c.getString(i)));
-                }
-                Log.d(TAG, msgData.toString());
                 ctr++;
+                Log.d(TAG, String.valueOf(ctr));
+
+                int id = c.getInt(0);
+                int thread_id = c.getInt(1);
+                String address = c.getString(2);
+                long date = c.getLong(3);
+                String protocol = c.getString(4);
+                String body = c.getString(5);
+                boolean sent = false;
+                if (protocol == null) {
+                    sent = true;
+                }
+
+                SMSData smsData = new SMSData(id, thread_id, address, date, sent, body);
+
+                Log.d(TAG, smsData.toString());
 
                 if (updateLatest) {
-                    int id = c.getInt(0);
-                    int thread_id = c.getInt(1);
-                    String address = c.getString(2);
-                    String date = c.getString(3);
-                    String protocol = c.getString(4);
-                    String body = c.getString(5);
-                    boolean sent = false;
-                    if (protocol == null) {
-                        sent = true;
-                    }
-
-                    Globals.latestSmsSeen = new SMSData(id, thread_id, address, date, sent, body);
-
+                    Globals.latestSmsSeen = smsData;
+                    SharedPreferences.Editor spEdit = sharedPrefs.edit();
+                    spEdit.putInt(context.getString(R.string.last_id), smsData.getId());
+                    spEdit.putLong(context.getString(R.string.last_timestamp), smsData.getDate());
+                    spEdit.apply();
                     updateLatest = false;
                 }
 
-            } while (ctr < target && c.moveToNext());
+            } while (c.moveToNext());
         }
 
         if (c != null) {
