@@ -12,7 +12,7 @@ public class SMSData  {
     public static Map<String, String> fieldsMap;
     static {
         fieldsMap = new HashMap<>();
-        fieldsMap.put("id", "id");
+        fieldsMap.put("id", "_id");
         fieldsMap.put("thread_id", "thread_id");
         fieldsMap.put("address", "phone_number");
         fieldsMap.put("date", "datetime");
