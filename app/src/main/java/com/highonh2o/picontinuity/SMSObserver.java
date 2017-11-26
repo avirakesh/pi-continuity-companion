@@ -51,17 +51,13 @@ public class SMSObserver extends ContentObserver {
 
         String prefsName = context.getString(R.string.package_name) + "." + context.getString(R.string.preference_file_key);
         SharedPreferences sharedPrefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE);
-        int lastId = sharedPrefs.getInt(context.getString(R.string.last_id), -1);
         long lastTime = sharedPrefs.getLong(context.getString(R.string.last_timestamp), 0);
         List<SMSData> smsDataList = new ArrayList<>();
 
 
-        if (Globals.latestSmsSeen != null) {
-            selection = String.format("%s > ? AND %s > ?", columns[3], columns[0]);
-            selectArgs = new String[]{String.valueOf(Globals.latestSmsSeen.getDate()), String.valueOf(Globals.latestSmsSeen.getId())};
-        } else if (lastId != -1) {
-            selection = String.format("%s > ? AND %s > ?", columns[3], columns[0]);
-            selectArgs = new String[]{String.valueOf(lastTime), String.valueOf(lastId)};
+        if (lastTime != 0) {
+            selection = String.format("%s > ?", columns[3]);
+            selectArgs = new String[]{String.valueOf(lastTime)};
         } else {
             long currTime = new Date().getTime();
             long diff = 5 * 24 * 60 * 60 * 1000;
@@ -81,7 +77,6 @@ public class SMSObserver extends ContentObserver {
         if (c != null && c.moveToFirst()) {
             int ctr = 0;
 
-            boolean updateLatest = true;
 
             do {
                 ctr++;
@@ -103,14 +98,13 @@ public class SMSObserver extends ContentObserver {
 
 //                Log.d(TAG, smsData.toString());
 
-                if (updateLatest) {
-                    Globals.latestSmsSeen = smsData;
+                /*if (updateLatest) {
                     SharedPreferences.Editor spEdit = sharedPrefs.edit();
                     spEdit.putInt(context.getString(R.string.last_id), smsData.getId());
                     spEdit.putLong(context.getString(R.string.last_timestamp), smsData.getDate());
                     spEdit.apply();
                     updateLatest = false;
-                }
+                }*/
 
                 smsDataList.add(smsData);
 
