@@ -1,10 +1,25 @@
 package com.highonh2o.picontinuity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by avichalrakesh on 11/6/17.
  */
 
 public class SMSData  {
+
+    public static Map<String, String> fieldsMap;
+    static {
+        fieldsMap = new HashMap<>();
+        fieldsMap.put("id", "id");
+        fieldsMap.put("thread_id", "thread_id");
+        fieldsMap.put("address", "phone_number");
+        fieldsMap.put("date", "datetime");
+        fieldsMap.put("type", "type");
+        fieldsMap.put("body", "body");
+    }
+
     private int id;
     private int thread_id;
     private String address;
