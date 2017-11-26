@@ -24,7 +24,7 @@ public class SMSNetworkHandler {
     public static long lastTime = 0;
     public static int lastId = -1;
 
-    static void queueNewMessages(Context context, List<SMSData> newMessages) {
+    static void queueNewMessages(final Context context, List<SMSData> newMessages) {
         Log.d(TAG, "Queuing new Messages");
         final String json = getSmsJsonString(newMessages);
         Log.d(TAG, json);
@@ -32,7 +32,24 @@ public class SMSNetworkHandler {
         StringRequest request = new StringRequest(Request.Method.POST, Globals.URL_BASE + Globals.ADD_SMS_EXT, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, response);
+
+                try {
+                    JSONObject responseJson = new JSONObject(response);
+                    int status = responseJson.getInt("status");
+                    if (status != 0) {
+                        // Ran into an issue during addition.
+                        Log.d(TAG, response);
+                    } else {
+                        Log.d(TAG, "Network Request Successful!");
+                        long latest = responseJson.getJSONObject("success_data").getLong("latest_time");
+                        if (latest > Globals.getLatestSmsTime(context)) {
+                            Globals.updateLatestSmsTime(context, latest);
+                        }
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
