@@ -3,6 +3,12 @@ package com.highonh2o.picontinuity;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,11 +21,37 @@ import java.util.List;
 
 public class SMSNetworkHandler {
     private static String TAG = "SMSNetworkHandler";
+    public static long lastTime = 0;
+    public static int lastId = -1;
 
     static void queueNewMessages(Context context, List<SMSData> newMessages) {
         Log.d(TAG, "Queuing new Messages");
-        String json = getSmsJsonString(newMessages);
+        final String json = getSmsJsonString(newMessages);
         Log.d(TAG, json);
+
+        StringRequest request = new StringRequest(Request.Method.POST, Globals.URL_BASE + Globals.ADD_SMS_EXT, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Failed To response.\n" + error.getMessage());
+            }
+        }) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return json.getBytes();
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(context, request);
     }
 
     private static String getSmsJsonString(List<SMSData> newMessages) {
